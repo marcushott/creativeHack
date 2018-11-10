@@ -37,14 +37,11 @@ data_transform = transforms.Compose([transforms.ToPILImage(), transforms.Resize(
 norm_transform = transforms.Normalize(mean=mean, std=dev)
 
 train_data = OutfitData(data_file=datapath+'train.json', transform = data_transform, norm_transform = norm_transform)
-validate_data = OutfitData(data_file=datapath+'train.json', transform = data_transform)#, norm_transform = norm_transform)
+validate_data = OutfitData(data_file=datapath+'validate.json', transform = data_transform)#, norm_transform = norm_transform)
 print("Number of training samples: ", train_data.__len__())
 
 train_loader = torch.utils.data.DataLoader(train_data, batch_size=5, shuffle=True, num_workers=4)
 val_loader = torch.utils.data.DataLoader(validate_data, batch_size=5, shuffle=True, num_workers=4)
-
-# a separate loader to output the wrong predictions of the trained model
-#val_check_loader = torch.utils.data.DataLoader(validate_data, batch_size=1, shuffle=False, num_workers=4) 
 
 model = ClassificationNN()
 solver = Solver(optim_args={"lr": 5e-6, "weight_decay": 0.004})
@@ -79,28 +76,32 @@ test_results= []
 model.eval()
 
 for inputs, id in test_loader:
-    inputs0, inputs1 = Variable(inputs[0]), Variable(inputs[1])
+    img = Variable(img)
     if model.is_cuda:
-        inputs0, inputs1 = inputs0.cuda(), inputs1.cuda()
+        img = img.cuda()
     
     prob = torch.nn.Softmax()
-    outputs = prob(model.forward(inputs0, inputs1))
+    outputs = prob(model.forward(img))
     outputs = outputs.data.cpu().numpy()
     
     test_results.append((id[0], outputs[0,1]))
     print(test_results[-1])
 
+# a separate loader to output the wrong predictions of the trained model
+val_check_loader = torch.utils.data.DataLoader(validate_data, batch_size=1, shuffle=False, num_workers=4) 
 val_wrong = []
-for id, (inputs, target) in enumerate(val_check_loader):
-    inputs0, inputs1 = Variable(inputs[0]), Variable(inputs[1])
+for id, (img, target) in enumerate(val_check_loader):
+    img = Variable(img)
     
+    print(model.is_cuda)
     if model.is_cuda:
-        inputs0, inputs1 = inputs0.cuda(), inputs1.cuda()
-    
+        img = img.cuda()
+        
     prob = torch.nn.Softmax()
-    outputs = prob(model.forward(inputs0, inputs1))
+    outputs = prob(model.forward(img))
     outputs = outputs.data.cpu().numpy()
     
+    print(outputs)
     if ((outputs[0,1] > 0.5 and target[0] == 0) or (outputs[0,1] < 0.5 and target[0] == 1)):
         val_wrong.append((validate_data.data[id]["id"], target[0]))
 
