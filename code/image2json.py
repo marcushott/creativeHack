@@ -28,10 +28,8 @@ label_negative = [0]* len(bad_outfit_list)
 labels = label_positive + label_negative
 #zip labels and outfits before shuffeling
 image_and_labels = list(zip(labels,outfits))
-print(labels)
 shuffle(image_and_labels)
 labels, outfits = zip(*image_and_labels)
-print(labels)
 #assign train, validate and test set
 number_images = len(outfits)
 step1 = int(0.8*number_images)
