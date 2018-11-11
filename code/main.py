@@ -33,19 +33,21 @@ data_transform = transforms.Compose([
          transforms.ToTensor(),
 ])
 
-data_transform = transforms.Compose([transforms.ToPILImage(), transforms.Resize((224,224)), transforms.ToTensor()])
+#data_transform = transforms.Compose([transforms.ToPILImage(), transforms.Resize((224,224)), transforms.ToTensor()])
 norm_transform = transforms.Normalize(mean=mean, std=dev)
 
-train_data = OutfitData(data_file=datapath+'train.json', transform = data_transform, norm_transform = norm_transform)
-validate_data = OutfitData(data_file=datapath+'validate.json', transform = data_transform)#, norm_transform = norm_transform)
+train_data = OutfitData(data_file=datapath+'train.json', transform = None, norm_transform = norm_transform)
+validate_data = OutfitData(data_file=datapath+'validate.json', transform = None, norm_transform = norm_transform)
+test_data = OutfitData(data_file=datapath+'test.json', transform = None, norm_transform = norm_transform)
 print("Number of training samples: ", train_data.__len__())
 
-train_loader = torch.utils.data.DataLoader(train_data, batch_size=5, shuffle=True, num_workers=4)
-val_loader = torch.utils.data.DataLoader(validate_data, batch_size=5, shuffle=True, num_workers=4)
+train_loader = torch.utils.data.DataLoader(train_data, batch_size=25, shuffle=True, num_workers=4)
+val_loader = torch.utils.data.DataLoader(validate_data, batch_size=25, shuffle=True, num_workers=4)
 
 model = ClassificationNN()
-solver = Solver(optim_args={"lr": 5e-6, "weight_decay": 0.004})
-solver.train(model, train_loader, val_loader, log_nth=0, num_epochs=1)
+print(model.is_cuda)
+solver = Solver(optim_args={"lr": 1e-5, "weight_decay": 0.004})
+solver.train(model, train_loader, val_loader, log_nth=0, num_epochs=10)
 
 # standard plotting - loss and accuracy
 fig = plt.figure()
@@ -65,7 +67,6 @@ plt.ylabel('accuracy')
 plt.grid()
 fig.savefig("../Images/loss.png")
 
-test_data = OutfitData(data_file=datapath+'test.json', norm_transform=norm_transform)
 test_loader = torch.utils.data.DataLoader(test_data,
                                           batch_size=1,
                                           shuffle=False,
@@ -75,7 +76,7 @@ test_loader = torch.utils.data.DataLoader(test_data,
 test_results= []
 model.eval()
 
-for inputs, id in test_loader:
+for img, id in test_loader:
     img = Variable(img)
     if model.is_cuda:
         img = img.cuda()
@@ -103,7 +104,7 @@ for id, (img, target) in enumerate(val_check_loader):
     
     print(outputs)
     if ((outputs[0,1] > 0.5 and target[0] == 0) or (outputs[0,1] < 0.5 and target[0] == 1)):
-        val_wrong.append((validate_data.data[id]["id"], target[0]))
+        val_wrong.append((validate_data.data[id]["img"], target[0]))
 
 model.train()
 

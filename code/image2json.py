@@ -52,11 +52,11 @@ test_data = [{"img": image,
             "label": y} for image,y in zip(test_list, test_labels)]
 
 #encode json objects and write to files
-with open('train.json', 'w') as outfile:  
+with open('../datasets/train.json', 'w') as outfile:  
     json.dump(train_data, outfile)
-with open('validate.json', 'w') as outfile:  
+with open('../datasets/validate.json', 'w') as outfile:  
     json.dump(validate_data, outfile)
-with open('test.json', 'w') as outfile:  
+with open('../datasets/test.json', 'w') as outfile:  
     json.dump(test_data, outfile)
     
     
