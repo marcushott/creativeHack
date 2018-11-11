@@ -15,6 +15,7 @@ from pprint import pprint
 import _pickle as pickle
 
 def get_image_from_name(imname):
+    #print(imname)
     return cv2.imread("../datasets/img_raw/"+imname).astype(dtype="float32") 
 
 def compute_norm_params(data_file):

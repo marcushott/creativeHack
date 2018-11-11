@@ -34,7 +34,6 @@ class ClassificationNN(nn.Module):
         manually but by calling a model instance directly.
         """ 
         img = self.vgg.features(img)
-        print(img.shape)
         img = img.view(img.size(0), -1)
         #print()
         #img = self.vgg.classifier(img)

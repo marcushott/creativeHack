@@ -40,12 +40,13 @@ train_data = OutfitData(data_file=datapath+'train.json', transform = None, norm_
 validate_data = OutfitData(data_file=datapath+'validate.json', transform = None, norm_transform = norm_transform)
 test_data = OutfitData(data_file=datapath+'test.json', transform = None, norm_transform = norm_transform)
 print("Number of training samples: ", train_data.__len__())
+print("Number of validation samples: ", validate_data.__len__())
+print("Number of test samples: ", test_data.__len__())
 
 train_loader = torch.utils.data.DataLoader(train_data, batch_size=25, shuffle=True, num_workers=4)
 val_loader = torch.utils.data.DataLoader(validate_data, batch_size=25, shuffle=True, num_workers=4)
 
 model = ClassificationNN()
-print(model.is_cuda)
 solver = Solver(optim_args={"lr": 1e-5, "weight_decay": 0.004})
 solver.train(model, train_loader, val_loader, log_nth=0, num_epochs=10)
 
@@ -94,7 +95,6 @@ val_wrong = []
 for id, (img, target) in enumerate(val_check_loader):
     img = Variable(img)
     
-    print(model.is_cuda)
     if model.is_cuda:
         img = img.cuda()
         
