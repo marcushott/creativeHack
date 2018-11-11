@@ -81,7 +81,6 @@ class Solver(object):
                     print('[Iteration %d/%d] TRAIN loss: %.3f' % 
                             (iter, iter_per_epoch*num_epochs*train_loader.batch_size, loss.data[0]))
                 # collect statistics
-                print(output.data)
                 _, predicted = torch.max(output.data,1)
                 correct_training = (predicted == target.data).sum()
                 correct_training_overall += correct_training

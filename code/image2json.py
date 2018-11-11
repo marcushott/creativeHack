@@ -36,14 +36,18 @@ labels, outfits = zip(*image_and_labels)
 
 #assign train, validate and test set
 number_images = len(outfits)
-step1 = int(0.8*number_images)
-step2 = int(0.9*number_images)
-test_list = outfits[step1:step2]
-test_labels = labels[step1:step2]
-validate_list = outfits[step2:]
-validate_labels = labels[step2:]
-outfits = outfits[:step1]
+step1 = int(0.85*number_images)
+step2 = number_images-1#int(0.95*number_images)
+
 train_labels = labels[:step1]
+
+validate_list = outfits[step1:step2]
+validate_labels = labels[step1:step2]
+
+test_list = outfits[step2:]
+test_labels = labels[step2:]
+
+outfits = outfits[:step1]
 
 
 #add images to train, validate and test json object

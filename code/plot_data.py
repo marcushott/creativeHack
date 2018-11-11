@@ -7,7 +7,6 @@ import random
 import plotly.plotly as py 
 import numpy as np
 
-
 def get_class_angles(datafile, train = False):
     with open(datafile) as json_data:
         data = json.load(json_data)
